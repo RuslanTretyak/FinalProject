@@ -1,7 +1,6 @@
-package com.application.model;
+package com.application.model.entity;
 
 import jakarta.persistence.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 

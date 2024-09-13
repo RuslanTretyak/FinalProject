@@ -1,4 +1,4 @@
-package com.application.model;
+package com.application.model.entity;
 
 import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -13,15 +13,14 @@ public class Person {
     @Column(name = "person_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int personId;
-    @Column(name = "username")
-    private String username;
+    @Column(name = "login")
+    private String login;
     @Column(name = "name")
     private String name;
     @Column(name = "surname")
     private String surname;
     @Column(name = "date_of_birth")
     @Temporal(TemporalType.DATE)
-    @DateTimeFormat(pattern = "dd/MM/yyyy")
     private Date dateOFBirth;
     @Column(name = "email")
     private String email;
@@ -37,6 +36,7 @@ public class Person {
     @OneToMany(mappedBy = "person")
     private List<Order> orders;
 
+
     public int getPersonId() {
         return personId;
     }
@@ -45,12 +45,12 @@ public class Person {
         this.personId = personId;
     }
 
-    public String getUsername() {
-        return username;
+    public String getLogin() {
+        return login;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setLogin(String login) {
+        this.login = login;
     }
 
     public String getName() {
