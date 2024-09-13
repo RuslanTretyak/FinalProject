@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Student</title>
+    <style>
+    .error {
+        color: red;
+    }
+    </style>
+</head>
+<body>
+<form th:action="@{/person/register}" th:method="post" th:object="${personDTO}">
+    <p th:each="error : ${#fields.errors('login')}" class="error" th:text="${error}"></p>
+    <label for="login">Login: </label>
+    <input type="text" th:field="*{login}" id="login" th:value="*{login}">
+    <br>
+    <p th:each="error : ${#fields.errors('name')}" class="error" th:text="${error}"></p>
+    <label for="name">Name: </label>
+    <input type="text" th:field="*{name}" id="name" th:value="*{name}">
+    <br>
+    <p th:each="error : ${#fields.errors('surname')}" class="error" th:text="${error}"></p>
+    <label for="surname">Surname: </label>
+    <input type="text" th:field="*{surname}" id="surname" th:value="*{surname}">
+    <br>
+    <p th:each="error : ${#fields.errors('dateOfBirth')}" class="error" th:text="${error}"></p>
+    <label for="dateOfBirth">Date Of Birth: </label>
+    <input type="date" th:field="*{dateOfBirth}" id="dateOfBirth" th:value="*{dateOfBirth}">
+    <br>
+    <p th:each="error : ${#fields.errors('email')}" class="error" th:text="${error}"></p>
+    <label for="email">Email: </label>
+    <input type="text" th:field="*{email}" id="email" th:value="*{email}">
+    <br>
+    <p th:each="error : ${#fields.errors('password')}" class="error" th:text="${error}"></p>
+    <label for="password">Password: </label>
+    <input type="text" th:field="*{password}" id="password" th:value="*{password}">
+    <br>
+    <p th:each="error : ${#fields.errors('verificationPassword')}" class="error" th:text="${error}"></p>
+    <label for="verificationPassword">Verification Password: </label>
+    <input type="text" th:field="*{verificationPassword}" id="verificationPassword" th:value="*{verificationPassword}">
+    <br>
+    <input type="submit" value="Create"/>
+</form>
+<form action="/logout" method="get">
+    <input type="submit" value="logout"/>
+</form>
+
+</body>
+</html>
