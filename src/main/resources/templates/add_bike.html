@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Bike</title>
+    <style>
+    .error {
+        color: red;
+    }
+    </style>
+</head>
+<body>
+<form th:action="@{/admin/bike/add}" th:method="post" th:object="${bike}">
+    <p th:each="error : ${#fields.errors('serialNumber')}" class="error" th:text="${error}"></p>
+    <label for="serialNumber">Serial Number: </label>
+    <input type="text" th:field="*{serialNumber}" id="serialNumber" th:value="*{serialNumber}">
+    <br>
+    <label for="status">Status :</label>
+    <select id="status" name="status" th:field="*{status}">
+        <option th:each="status : ${statuses}" th:text="${status}" th:value="${status}"/>
+    </select>
+    <br>
+    <input type="submit" value="Create"/>
+</form>
+<form action="/logout" method="get">
+    <input type="submit" value="logout"/>
+</form>
+
+</body>
+</html>

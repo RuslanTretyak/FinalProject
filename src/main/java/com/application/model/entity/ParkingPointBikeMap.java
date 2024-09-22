@@ -7,8 +7,9 @@ import jakarta.persistence.*;
 public class ParkingPointBikeMap {
     @Id
     @Column(name = "parking_point_bike_map_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int parkingPointId;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "parkingPoint", referencedColumnName = "parking_point_id")
     private ParkingPoint parkingPoint;
     @OneToOne
