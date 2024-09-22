@@ -7,7 +7,6 @@ import com.application.repository.PersonRoleRepository;
 import com.application.util.MapperUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,9 +28,25 @@ public class PersonService {
     @Transactional
     public void registerPerson(PersonDTO personDTO){
         personDTO.setPassword(passwordEncoder.encode(personDTO.getPassword()));
-        Person person = personDTOMapper.mapToPersonEntity(new Person(), personDTO);
+        Person person = personDTOMapper.mapToPersonEntity(personDTO);
         person.setStatus(true);
         person.setPersonRole(personRoleRepository.findByPersonRoleName("ROLE_USER"));
         personRepository.save(person);
+    }
+    public Person getPersonById(int id){
+        return personRepository.findById(id).get();
+    }
+    public Person getPersonByLogin(String login){
+        return personRepository.findByLogin(login).get();
+    }
+
+    @Transactional
+    public void changePerson(PersonDTO personDTO, Person person) {
+        person.setName(personDTO.getName());
+        person.setSurname(personDTO.getSurname());
+        person.setEmail(personDTO.getEmail());
+        person.setDateOfBirth(personDTO.getDateOfBirth());
+        personRepository.save(person);
+
     }
 }

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration Page</title>
+    <style>
+    .error {
+        color: red;
+    }
+    </style>
+</head>
+<body>
+<form th:action="@{/user/change}" th:method="post" th:object="${personDTO}">
+    <p th:each="error : ${#fields.errors('name')}" class="error" th:text="${error}"></p>
+    <label for="name">Name: </label>
+    <input type="text" th:field="*{name}" id="name" th:value="*{name}">
+    <br>
+    <p th:each="error : ${#fields.errors('surname')}" class="error" th:text="${error}"></p>
+    <label for="surname">Surname: </label>
+    <input type="text" th:field="*{surname}" id="surname" th:value="*{surname}">
+    <br>
+    <p th:each="error : ${#fields.errors('dateOfBirth')}" class="error" th:text="${error}"></p>
+    <label for="dateOfBirth">Date Of Birth: </label>
+    <input type="date" th:field="*{dateOfBirth}" id="dateOfBirth" th:value="*{dateOfBirth}">
+    <br>
+    <p th:each="error : ${#fields.errors('email')}" class="error" th:text="${error}"></p>
+    <label for="email">Email: </label>
+    <input type="text" th:field="*{email}" id="email" th:value="*{email}">
+    <br>
+    <input type="hidden" th:field="*{login}" id="login" th:value="*{login}">
+    <input type="hidden" th:field="*{password}" id="password" th:value="*{password}">
+    <input type="hidden" th:field="*{verificationPassword}" id="verificationPassword" th:value="*{verificationPassword}">
+    <input type="submit" value="Change"/>
+</form>
+<form action="/logout" method="get">
+    <input type="submit" value="logout"/>
+</form>
+<br>
+<form action="/user/my_info" method="get">
+    <input type="submit" value="return"/>
+</form>
+
+</body>
+</html>
