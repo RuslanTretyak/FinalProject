@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Bikes</title>
+</head>
+<body>
+<div th:each="bike : ${bikes}">
+  <p th:text="'S/N: ' + ${bike.serialNumber} + ', status: ' + ${bike.status}"></p>
+  <form th:action="@{'/admin/bike/' + ${bike.bikeId}}" method="get">
+    <input type="submit" value="Info"/>
+  </form>
+</div>
+<br>
+<form action="/admin/bike/add" method="get">
+  <input type="submit" value="add"/>
+</form>
+<form action="/logout" method="get">
+  <input type="submit" value="logout"/>
+</form>
+</body>
+</html>

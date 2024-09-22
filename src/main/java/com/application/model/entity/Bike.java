@@ -1,6 +1,8 @@
 package com.application.model.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
@@ -12,8 +14,11 @@ public class Bike {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int bikeId;
     @Column(name = "serial_number")
+    @NotEmpty(message = "Serial Number field cannot be empty")
+    @Size(min = 5, max = 10)
     private String serialNumber;
     @Column(name = "status")
+    @NotEmpty(message = "Status field cannot be empty")
     private String status;
     @OneToMany(mappedBy = "bike")
     private List<Order> orders;
@@ -43,5 +48,13 @@ public class Bike {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return "Bike{" +
+                "bikeId=" + bikeId +
+                ", serialNumber='" + serialNumber + '\'' +
+                '}';
     }
 }

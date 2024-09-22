@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="'S/N: ' + ${bike.serialNumber}"/>
+</head>
+<body>
+<div>
+  <p th:text="'S/N: ' + ${bike.serialNumber}"></p>
+  <p th:text="'Status: ' + ${bike.status}"></p>
+</div>
+<br>
+<form th:action="@{/admin/bike}" th:method="post" th:object="${bike}">
+  <input type="hidden" th:field="*{bikeId}" id="bikeId" th:value="*{bikeId}">
+  <input type="hidden" th:field="*{serialNumber}" id="serialNumber" th:value="*{serialNumber}">
+  <label for="status">Status :</label>
+  <select id="status" name="status" th:field="*{status}">
+    <option th:each="statusTitle : ${statuses}" th:text="${statusTitle}" th:value="${statusTitle}"/>
+  </select>
+  <br>
+  <input type="submit" value="Create"/>
+</form>
+<form action="/admin/bike" method="get">
+  <input type="submit" value="Bikes"/>
+</form>
+</body>
+</html>
