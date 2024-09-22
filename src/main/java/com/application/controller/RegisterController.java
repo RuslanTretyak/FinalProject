@@ -14,29 +14,29 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
-public class PersonController {
+public class RegisterController {
     private PersonService personService;
     private PersonValidator personValidator;
 
 
     @Autowired
-    public PersonController(PersonService personService, PersonValidator personValidator, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public RegisterController(PersonService personService, PersonValidator personValidator, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.personService = personService;
         this.personValidator = personValidator;
     }
 
-    @GetMapping("/person/register")
+    @GetMapping("/register")
     public ModelAndView showRegisterPage(@ModelAttribute PersonDTO personDTO) {
         return new ModelAndView("register_person");
     }
-    @PostMapping("/person/register")
+    @PostMapping("/register")
     public ModelAndView registerPerson(@Valid @ModelAttribute PersonDTO personDTO, BindingResult result){
         personValidator.validate(personDTO, result);
         if (result.hasErrors()) {
             return new ModelAndView("register_person", "person", personDTO);
         } else {
             personService.registerPerson(personDTO);
-            return new ModelAndView("redirect:/test");
+            return new ModelAndView("redirect:/auth/home");
         }
     }
 

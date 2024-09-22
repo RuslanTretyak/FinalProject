@@ -28,12 +28,12 @@ public class SecurityConfig {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/error").permitAll()
+                        .requestMatchers("/auth/login", "/register", "/error").permitAll()
                         .anyRequest().authenticated())
                 .formLogin(formLogin -> formLogin
                         .loginPage("/auth/login")
                         .loginProcessingUrl("/process_login")
-                        .defaultSuccessUrl("/test", true)
+                        .defaultSuccessUrl("/auth/home", true)
                         .failureUrl("/auth/login?error"))
                 .logout(logout -> logout
                         .logoutUrl("/logout")

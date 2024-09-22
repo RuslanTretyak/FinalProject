@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Home Page</title>
+</head>
+<body>
+<form action="/logout" method="get">
+    <input type="submit" value="logout"/>
+</form>
+<div th:if="${person.personRole.personRoleName == 'ROLE_ADMIN'}">
+    <p>ADMIN</p>
+    <form action="/admin/bike" method="get">
+        <input type="submit" value="bike"/>
+    </form>
+    <form action="/admin/parking" method="get">
+        <input type="submit" value="parking"/>
+    </form>
+</div>
+
+<p>USER</p>
+<form action="/user/my_info" method="get">
+    <input type="submit" value="My info"/>
+</form>
+
+
+</body>
+</html>
