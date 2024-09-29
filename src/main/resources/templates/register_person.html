@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Create Student</title>
+    <title>Registration Page</title>
     <style>
     .error {
         color: red;
@@ -10,7 +10,7 @@
     </style>
 </head>
 <body>
-<form th:action="@{/person/register}" th:method="post" th:object="${personDTO}">
+<form th:action="@{/register}" th:method="post" th:object="${personDTO}">
     <p th:each="error : ${#fields.errors('login')}" class="error" th:text="${error}"></p>
     <label for="login">Login: </label>
     <input type="text" th:field="*{login}" id="login" th:value="*{login}">

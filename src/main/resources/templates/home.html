@@ -22,6 +22,19 @@
 <form action="/user/my_info" method="get">
     <input type="submit" value="My info"/>
 </form>
+<br>
+<p>CURRENT ORDERS</p>
+<div th:each="order : ${orders}">
+    <div th:if="${order.status == 'OPEN'}">
+        <p th:text="'Bike: ' + ${order.bike.serialNumber} + ', term: ' + ${order.endDate}"></p>
+    </div>
+</div>
+<form action="/user/order_history" method="get">
+    <input type="submit" value="Order history"/>
+</form>
+<form action="/user/make_order" method="post">
+    <input type="submit" value="Order bike"/>
+</form>
 
 
 </body>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="'S/N: ' + ${parkingPoint.name}"/>
+</head>
+<body>
+<div>
+  <p th:text="'Name: ' + ${parkingPoint.name}"></p>
+  <p th:text="'Address: ' + ${parkingPoint.address}"></p>
+</div>
+<br>
+<form action="/admin/parking" method="get">
+  <input type="submit" value="Parking"/>
+</form>
+<br>
+<p>placement</p>
+<div th:each="bike : ${placementBikes}">
+  <p th:text="'S/N: ' + ${bike.serialNumber} + ', status: ' + ${bike.status}"></p>
+  <form th:action="@{'/admin/parking/remove_bike/' + ${bike.bikeId} + '/' + ${parkingPoint.parkingPointId}}" method="post">
+    <input type="submit" value="remove"/>
+  </form>
+</div>
+<br>
+<br>
+<p>available</p>
+<div th:each="bike : ${availableBikes}">
+  <p th:text="'S/N: ' + ${bike.serialNumber} + ', status: ' + ${bike.status}"></p>
+  <form th:action="@{'/admin/parking/add_bike/' + ${bike.bikeId} + '/' + ${parkingPoint.parkingPointId}}" method="post">
+    <input type="submit" value="Add"/>
+  </form>
+</div>
+<br>
+</body>
+</html>
