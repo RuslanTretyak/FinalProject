@@ -1,11 +1,14 @@
 package com.application.controller;
 
+import com.application.model.dto.OrderDTO;
 import com.application.model.dto.PersonDTO;
 import com.application.model.entity.Person;
+import com.application.service.BikeService;
+import com.application.service.OrderService;
+import com.application.service.ParkingService;
 import com.application.service.PersonService;
 import com.application.util.MapperUtil;
 import com.application.util.PersonChangeValidator;
-import com.application.util.PersonValidator;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,12 +27,18 @@ public class UserController {
     private PersonService personService;
     private MapperUtil mapperUtil;
     private PersonChangeValidator personChangeValidator;
+    private ParkingService parkingService;
+    private BikeService bikeService;
+    private OrderService orderService;
 
     @Autowired
-    public UserController(PersonService personService, MapperUtil mapperUtil, PersonChangeValidator personChangeValidator) {
+    public UserController(PersonService personService, MapperUtil mapperUtil, PersonChangeValidator personChangeValidator, ParkingService parkingService, BikeService bikeService, OrderService orderService) {
         this.personService = personService;
         this.mapperUtil = mapperUtil;
         this.personChangeValidator = personChangeValidator;
+        this.parkingService = parkingService;
+        this.bikeService = bikeService;
+        this.orderService = orderService;
     }
 
 
@@ -55,5 +64,25 @@ public class UserController {
             personService.changePerson(personDTO, person);
             return new ModelAndView("redirect:/user/my_info");
         }
+    }
+    @PostMapping("/make_order")
+    public ModelAndView createOrder(@AuthenticationPrincipal UserDetails userDetails, @ModelAttribute("order")OrderDTO orderDTO) {
+        Person person = personService.getPersonByLogin(userDetails.getUsername());
+        if (orderDTO.getParkingPointId() == 0){
+            return new ModelAndView("choose_parking_to_order", "parking", parkingService.getAllParking());
+        } else if (orderDTO.getBikeId() == 0){
+            return new ModelAndView("choose_bike_to_order", "bikes", bikeService.getBikeFromParking(orderDTO.getParkingPointId()));
+        } else if (orderDTO.getTerm() == 0){
+            return new ModelAndView("choose_term_to_order");
+        } else {
+            orderDTO.setPerson(person);
+            orderService.createOrder(orderDTO);
+            return new ModelAndView("redirect:/auth/home");
+        }
+    }
+    @GetMapping("/order_history")
+    public ModelAndView getOrderHistory(@AuthenticationPrincipal UserDetails userDetails){
+        Person person = personService.getPersonByLogin(userDetails.getUsername());
+        return new ModelAndView("order_history", "orders", orderService.getOrdersByPerson(person));
     }
 }

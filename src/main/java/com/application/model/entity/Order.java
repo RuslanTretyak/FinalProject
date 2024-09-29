@@ -5,18 +5,20 @@ import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "order")
+@Table(name = "bike_order")
 public class Order {
+
+
     @Id
-    @Column(name = "orderId")
+    @Column(name = "order_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int orderId;
-    @Column(name = "dateOfBegin")
+    @Column(name = "date_of_begin")
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateOfBegin;
     @Column(name = "term")
     private int term;
-    @Column(name = "endDate")
+    @Column(name = "end_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date endDate;
     @ManyToOne
@@ -26,7 +28,7 @@ public class Order {
     @JoinColumn(name = "bike", referencedColumnName = "bike_id")
     private Bike bike;
     @ManyToOne
-    @JoinColumn(name = "parkingPoint", referencedColumnName = "parking_point_id")
+    @JoinColumn(name = "parking_point", referencedColumnName = "parking_point_id")
     private ParkingPoint parkingPoint;
     @Column(name = "status")
     private String status;

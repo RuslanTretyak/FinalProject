@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Orders</title>
+</head>
+<body>
+<form action="/logout" method="get">
+    <input type="submit" value="logout"/>
+</form>
+
+<p>ORDERS</p>
+<div th:each="order : ${orders}">
+        <p th:text="'Bike: ' + ${order.bike.serialNumber} + ', term: ' + ${order.endDate} + ', status: ' + ${order.status}"></p>
+</div>
+<form action="/auth/home" method="get">
+    <input type="submit" value="Home"/>
+</form>
+</body>
+</html>

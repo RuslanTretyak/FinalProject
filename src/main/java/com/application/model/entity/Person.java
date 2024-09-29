@@ -1,7 +1,6 @@
 package com.application.model.entity;
 
 import jakarta.persistence.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 import java.util.List;
@@ -21,7 +20,7 @@ public class Person {
     private String surname;
     @Column(name = "date_of_birth")
     @Temporal(TemporalType.DATE)
-    private Date dateOFBirth;
+    private Date dateOfBirth;
     @Column(name = "email")
     private String email;
     @Column(name = "balance")
@@ -69,12 +68,12 @@ public class Person {
         this.surname = surname;
     }
 
-    public Date getDateOFBirth() {
-        return dateOFBirth;
+    public Date getDateOfBirth() {
+        return dateOfBirth;
     }
 
-    public void setDateOFBirth(Date dateOFBirth) {
-        this.dateOFBirth = dateOFBirth;
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 
     public String getEmail() {

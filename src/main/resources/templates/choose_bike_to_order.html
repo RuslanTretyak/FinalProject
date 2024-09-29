@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Parking</title>
+</head>
+<body>
+<form action="/logout" method="get">
+  <input type="submit" value="logout"/>
+</form>
+<br>
+<form action="/user/make_order" method="post" th:object="${order}">
+<select name="bikeId" th:field="*{bikeId}">
+  <option th:each="bike : ${bikes}" th:text="${bike.serialNumber}" th:value="${bike.bikeId}"/>
+</select>
+  <input type="hidden" th:field="*{parkingPointId}" th:value="*{parkingPointId}" id="parkingPointId"/>
+  <input type="submit" value="Choose"/>
+</form>
+</body>
+</html>
