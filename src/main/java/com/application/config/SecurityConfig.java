@@ -29,7 +29,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login", "/register", "/error").permitAll()
-                        .anyRequest().authenticated())
+                        .requestMatchers("/admin/*").hasRole("ADMIN")
+                        .anyRequest().hasAnyRole("USER", "ADMIN"))
                 .formLogin(formLogin -> formLogin
                         .loginPage("/auth/login")
                         .loginProcessingUrl("/process_login")
