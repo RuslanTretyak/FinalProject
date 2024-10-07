@@ -1,5 +1,6 @@
 package com.application.controller;
 
+import com.application.exception.DataNotFoundException;
 import com.application.model.dto.OrderDTO;
 import com.application.model.dto.PersonDTO;
 import com.application.model.entity.Person;
@@ -43,19 +44,21 @@ public class UserController {
 
 
     @GetMapping("/my_info")
-    public ModelAndView getMyInfo(@AuthenticationPrincipal UserDetails userDetails) {
+    public ModelAndView getMyInfo(@AuthenticationPrincipal UserDetails userDetails) throws DataNotFoundException {
         Person person = personService.findPersonByLogin(userDetails.getUsername());
         return new ModelAndView("person_info", "person", person);
 
     }
+
     @GetMapping("/change")
-    public ModelAndView changePersonData(@AuthenticationPrincipal UserDetails userDetails) {
+    public ModelAndView changePersonData(@AuthenticationPrincipal UserDetails userDetails) throws DataNotFoundException {
         Person person = personService.findPersonByLogin(userDetails.getUsername());
         PersonDTO personDTO = mapperUtil.mapToPersonDTOEntity(person);
         return new ModelAndView("change_person", "personDTO", personDTO);
     }
+
     @PostMapping("/change")
-    public ModelAndView registerPerson(@AuthenticationPrincipal UserDetails userDetails, @Valid @ModelAttribute PersonDTO personDTO, BindingResult result){
+    public ModelAndView registerPerson(@AuthenticationPrincipal UserDetails userDetails, @Valid @ModelAttribute PersonDTO personDTO, BindingResult result) throws DataNotFoundException {
         Person person = personService.findPersonByLogin(userDetails.getUsername());
         personChangeValidator.validate(personDTO, result);
         if (result.hasErrors()) {
@@ -65,14 +68,15 @@ public class UserController {
             return new ModelAndView("redirect:/user/my_info");
         }
     }
+
     @PostMapping("/make_order")
-    public ModelAndView createOrder(@AuthenticationPrincipal UserDetails userDetails, @ModelAttribute("order")OrderDTO orderDTO) {
+    public ModelAndView createOrder(@AuthenticationPrincipal UserDetails userDetails, @ModelAttribute("order") OrderDTO orderDTO) throws DataNotFoundException {
         Person person = personService.findPersonByLogin(userDetails.getUsername());
-        if (orderDTO.getParkingPointId() == 0){
+        if (orderDTO.getParkingPointId() == 0) {
             return new ModelAndView("choose_parking_to_order", "parking", parkingService.getAllParking());
-        } else if (orderDTO.getBikeId() == 0){
+        } else if (orderDTO.getBikeId() == 0) {
             return new ModelAndView("choose_bike_to_order", "bikes", bikeService.getBikeFromParking(orderDTO.getParkingPointId()));
-        } else if (orderDTO.getTerm() == 0){
+        } else if (orderDTO.getTerm() == 0) {
             return new ModelAndView("choose_term_to_order");
         } else {
             orderDTO.setPerson(person);
@@ -80,8 +84,9 @@ public class UserController {
             return new ModelAndView("redirect:/auth/home");
         }
     }
+
     @GetMapping("/order_history")
-    public ModelAndView getOrderHistory(@AuthenticationPrincipal UserDetails userDetails){
+    public ModelAndView getOrderHistory(@AuthenticationPrincipal UserDetails userDetails) throws DataNotFoundException {
         Person person = personService.findPersonByLogin(userDetails.getUsername());
         return new ModelAndView("order_history", "orders", orderService.getOrdersByPerson(person));
     }

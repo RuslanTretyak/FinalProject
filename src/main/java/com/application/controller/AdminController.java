@@ -2,6 +2,7 @@ package com.application.controller;
 
 import com.application.constant.BikeStatus;
 import com.application.constant.OrderStatus;
+import com.application.exception.DataNotFoundException;
 import com.application.model.entity.Bike;
 import com.application.model.entity.ParkingPoint;
 import com.application.model.entity.Person;
@@ -58,14 +59,14 @@ public class AdminController {
     }
 
     @GetMapping("/bike/{id}")
-    public ModelAndView showBikeInfo(@PathVariable int id) {
+    public ModelAndView showBikeInfo(@PathVariable int id) throws DataNotFoundException {
         ModelAndView modelAndView = new ModelAndView("bike_info", "bike", bikeService.getBikeById(id));
         modelAndView.addObject("statuses", BikeStatus.values());
         return modelAndView;
     }
 
     @PostMapping("/bike")
-    public ModelAndView changeBikeStatus(@ModelAttribute Bike bike) {
+    public ModelAndView changeBikeStatus(@ModelAttribute Bike bike) throws DataNotFoundException {
         bikeService.updateBike(bike);
         ModelAndView modelAndView = new ModelAndView("bike_info", "bike", bikeService.getBikeById(bike.getBikeId()));
         modelAndView.addObject("statuses", BikeStatus.values());
@@ -79,7 +80,7 @@ public class AdminController {
     }
 
     @GetMapping("/parking/{id}")
-    public ModelAndView showParkingInfo(@PathVariable int id) {
+    public ModelAndView showParkingInfo(@PathVariable int id) throws DataNotFoundException {
         ModelAndView modelAndView = new ModelAndView("parking_info", "parkingPoint", parkingService.getParkingById(id));
         modelAndView.addObject("availableBikes", bikeService.getBikeByStatus(BikeStatus.AVAILABLE_FOR_PLACEMENT));
         modelAndView.addObject("placementBikes", bikeService.getBikeFromParking(id));
@@ -102,13 +103,13 @@ public class AdminController {
     }
 
     @PostMapping("/parking/add_bike/{bikeId}/{parkingId}")
-    public String addBikeToParking(@PathVariable int bikeId, @PathVariable int parkingId) {
+    public String addBikeToParking(@PathVariable int bikeId, @PathVariable int parkingId) throws DataNotFoundException {
         parkingPointBikeMapService.addBikeToParking(parkingId, bikeId);
         return "redirect:/admin/parking/" + parkingId;
     }
 
     @PostMapping("/parking/remove_bike/{bikeId}/{parkingId}")
-    public String removeBikeFromParking(@PathVariable int bikeId, @PathVariable int parkingId) {
+    public String removeBikeFromParking(@PathVariable int bikeId, @PathVariable int parkingId) throws DataNotFoundException {
         parkingPointBikeMapService.removeBikeFromParking(bikeId);
         return "redirect:/admin/parking/" + parkingId;
     }
@@ -119,7 +120,7 @@ public class AdminController {
     }
 
     @GetMapping("/user")
-    public ModelAndView findUser(@AuthenticationPrincipal UserDetails userDetails, @Param("login") String login, @Param("surname") String surname, @Param("name") String name) {
+    public ModelAndView findUser(@AuthenticationPrincipal UserDetails userDetails, @Param("login") String login, @Param("surname") String surname, @Param("name") String name) throws DataNotFoundException {
         Person person = personService.findPersonByLogin(userDetails.getUsername());
         List<Person> users;
         ModelAndView modelAndView = new ModelAndView("find_user", "person", person);
@@ -141,25 +142,29 @@ public class AdminController {
             return modelAndView.addObject("users", users);
         }
     }
+
     @GetMapping("/user/{id}")
-    public ModelAndView showUserInfoPage(@PathVariable("id") int id) {
+    public ModelAndView showUserInfoPage(@PathVariable("id") int id) throws DataNotFoundException {
         Person user = personService.findPersonById(id);
         ModelAndView modelAndView = new ModelAndView("user_info_admin", "user", user);
         modelAndView.addObject("orders", orderService.getOrdersByPersonAndStatus(user, OrderStatus.OPEN));
         return modelAndView;
     }
+
     @PostMapping("/user/{id}/change_status")
-    public ModelAndView unblockUser(@PathVariable("id") int id) {
+    public ModelAndView unblockUser(@PathVariable("id") int id) throws DataNotFoundException {
         personService.changePersonStatus(id);
         return new ModelAndView("redirect:/admin/user/" + id);
     }
+
     @PostMapping("/user/{id}/add_money")
-    public ModelAndView addMoneyToBalance(@PathVariable("id") int id, @Param("sum") double sum) {
+    public ModelAndView addMoneyToBalance(@PathVariable("id") int id, @Param("sum") double sum) throws DataNotFoundException {
         personService.changePersonBalance(id, sum);
         return new ModelAndView("redirect:/admin/user/" + id);
     }
+
     @PostMapping("/order/{id}/close")
-    public ModelAndView closeOrder(@PathVariable("id") int id) {
+    public ModelAndView closeOrder(@PathVariable("id") int id) throws DataNotFoundException {
         orderService.closeOrder(id);
         return new ModelAndView("redirect:/admin/user/" + orderService.getOrderById(id).getPerson().getPersonId());
     }

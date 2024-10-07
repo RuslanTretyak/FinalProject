@@ -2,6 +2,7 @@ package com.application.service;
 
 import com.application.constant.BikeStatus;
 import com.application.constant.OrderStatus;
+import com.application.exception.DataNotFoundException;
 import com.application.model.dto.OrderDTO;
 import com.application.model.entity.Bike;
 import com.application.model.entity.Order;
@@ -34,13 +35,13 @@ public class OrderService {
     }
 
     @Transactional
-    public void createOrder(OrderDTO orderDTO){
+    public void createOrder(OrderDTO orderDTO) throws DataNotFoundException {
         Date dateOfBegin = new Date();
         Order order = new Order();
-        Bike bike = bikeRepository.findById(orderDTO.getBikeId()).get();
+        Bike bike = bikeRepository.findById(orderDTO.getBikeId()).orElseThrow(() -> new DataNotFoundException("Bike with id " + orderDTO.getBikeId() + " was not found"));
         parkingPointBikeMapService.removeBikeFromParking(bike.getBikeId());
         bike.setStatus(BikeStatus.IN_ORDER.name());
-        order.setParkingPoint(parkingPointRepository.findById(orderDTO.getParkingPointId()).get());
+        order.setParkingPoint(parkingPointRepository.findById(orderDTO.getParkingPointId()).orElseThrow(() -> new DataNotFoundException("Parking Point with id " + orderDTO.getParkingPointId() + " was not found")));
         order.setBike(bike);
         order.setTerm(orderDTO.getTerm());
         order.setDateOfBegin(dateOfBegin);
@@ -57,16 +58,16 @@ public class OrderService {
     }
 
     @Transactional
-    public void closeOrder(int id) {
+    public void closeOrder(int id) throws DataNotFoundException {
         Date date = new Date();
-        Order order = orderRepository.findById(id).get();
+        Order order = orderRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Order with id " + id + " was not found"));
         order.setStatus(OrderStatus.CLOSE.name());
         order.getBike().setStatus(BikeStatus.AVAILABLE_FOR_PLACEMENT.name());
         order.setEndDate(date);
         Person person = order.getPerson();
         person.setBalance(person.getBalance() - appService.calculateCost(order.getDateOfBegin(), date));
     }
-    public Order getOrderById(int id){
-        return orderRepository.findById(id).get();
+    public Order getOrderById(int id) throws DataNotFoundException {
+        return orderRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Order with id " + id + " was not found"));
     }
 }

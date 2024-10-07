@@ -1,6 +1,7 @@
 package com.application.service;
 
 import com.application.constant.BikeStatus;
+import com.application.exception.DataNotFoundException;
 import com.application.model.entity.Bike;
 import com.application.model.entity.ParkingPointBikeMap;
 import com.application.repository.ParkingPointBikeMapRepository;
@@ -20,8 +21,9 @@ public class ParkingPointBikeMapService {
         this.parkingService = parkingService;
         this.bikeService = bikeService;
     }
+
     @Transactional
-    public void addBikeToParking(int parkingId, int bikeId) {
+    public void addBikeToParking(int parkingId, int bikeId) throws DataNotFoundException {
         ParkingPointBikeMap parkingPointBikeMap = new ParkingPointBikeMap();
         parkingPointBikeMap.setParkingPoint(parkingService.getParkingById(parkingId));
         Bike bike = bikeService.getBikeById(bikeId);
@@ -29,8 +31,9 @@ public class ParkingPointBikeMapService {
         parkingPointBikeMap.setBike(bike);
         parkingPointBikeMapRepository.save(parkingPointBikeMap);
     }
+
     @Transactional
-    public void removeBikeFromParking(int bikeId) {
+    public void removeBikeFromParking(int bikeId) throws DataNotFoundException {
         Bike bike = bikeService.getBikeById(bikeId);
         bike.setStatus(BikeStatus.AVAILABLE_FOR_PLACEMENT.name());
         parkingPointBikeMapRepository.removeBikeFromParking(bikeId);

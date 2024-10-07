@@ -27,8 +27,8 @@ public class PersonChangeValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         PersonDTO personDTO = (PersonDTO) target;
-        if(personDTO.getDateOfBirth() != null){
-            if(personDTO.getDateOfBirth().after(new Date())){
+        if (personDTO.getDateOfBirth() != null) {
+            if (personDTO.getDateOfBirth().after(new Date())) {
                 errors.rejectValue("dateOfBirth", "", "Date Of Birth is not correct");
             }
         }

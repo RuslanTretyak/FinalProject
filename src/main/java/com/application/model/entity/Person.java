@@ -35,7 +35,6 @@ public class Person {
     @OneToMany(mappedBy = "person")
     private List<Order> orders;
 
-
     public int getPersonId() {
         return personId;
     }
