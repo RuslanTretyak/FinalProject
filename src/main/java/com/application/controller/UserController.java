@@ -44,19 +44,19 @@ public class UserController {
 
     @GetMapping("/my_info")
     public ModelAndView getMyInfo(@AuthenticationPrincipal UserDetails userDetails) {
-        Person person = personService.getPersonByLogin(userDetails.getUsername());
+        Person person = personService.findPersonByLogin(userDetails.getUsername());
         return new ModelAndView("person_info", "person", person);
 
     }
     @GetMapping("/change")
     public ModelAndView changePersonData(@AuthenticationPrincipal UserDetails userDetails) {
-        Person person = personService.getPersonByLogin(userDetails.getUsername());
+        Person person = personService.findPersonByLogin(userDetails.getUsername());
         PersonDTO personDTO = mapperUtil.mapToPersonDTOEntity(person);
         return new ModelAndView("change_person", "personDTO", personDTO);
     }
     @PostMapping("/change")
     public ModelAndView registerPerson(@AuthenticationPrincipal UserDetails userDetails, @Valid @ModelAttribute PersonDTO personDTO, BindingResult result){
-        Person person = personService.getPersonByLogin(userDetails.getUsername());
+        Person person = personService.findPersonByLogin(userDetails.getUsername());
         personChangeValidator.validate(personDTO, result);
         if (result.hasErrors()) {
             return new ModelAndView("change_person", "personDTO", personDTO);
@@ -67,7 +67,7 @@ public class UserController {
     }
     @PostMapping("/make_order")
     public ModelAndView createOrder(@AuthenticationPrincipal UserDetails userDetails, @ModelAttribute("order")OrderDTO orderDTO) {
-        Person person = personService.getPersonByLogin(userDetails.getUsername());
+        Person person = personService.findPersonByLogin(userDetails.getUsername());
         if (orderDTO.getParkingPointId() == 0){
             return new ModelAndView("choose_parking_to_order", "parking", parkingService.getAllParking());
         } else if (orderDTO.getBikeId() == 0){
@@ -82,7 +82,7 @@ public class UserController {
     }
     @GetMapping("/order_history")
     public ModelAndView getOrderHistory(@AuthenticationPrincipal UserDetails userDetails){
-        Person person = personService.getPersonByLogin(userDetails.getUsername());
+        Person person = personService.findPersonByLogin(userDetails.getUsername());
         return new ModelAndView("order_history", "orders", orderService.getOrdersByPerson(person));
     }
 }

@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class PersonService {
 
@@ -33,11 +35,20 @@ public class PersonService {
         person.setPersonRole(personRoleRepository.findByPersonRoleName("ROLE_USER"));
         personRepository.save(person);
     }
-    public Person getPersonById(int id){
+    public Person findPersonById(int id){
         return personRepository.findById(id).get();
     }
-    public Person getPersonByLogin(String login){
+    public Person findPersonByLogin(String login){
         return personRepository.findByLogin(login).get();
+    }
+    public List<Person> findPersonBySurname(String surname){
+        return personRepository.findBySurname(surname);
+    }
+    public List<Person> findPersonByName(String name){
+        return personRepository.findByName(name);
+    }
+    public List<Person> findPersonBySurnameAndName(String surname, String name){
+        return personRepository.findByNameAndSurname(name, surname);
     }
 
     @Transactional
@@ -48,5 +59,17 @@ public class PersonService {
         person.setDateOfBirth(personDTO.getDateOfBirth());
         personRepository.save(person);
 
+    }
+
+    @Transactional
+    public void changePersonStatus(int id) {
+        Person person = personRepository.findById(id).get();
+        person.setStatus(!person.isStatus());
+    }
+
+    @Transactional
+    public void changePersonBalance(int id, double sum) {
+        Person person = personRepository.findById(id).get();
+        person.setBalance(person.getBalance() + sum);
     }
 }

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="${user.name} + ' ' + ${user.surname}"/>
+</head>
+<body>
+<div>
+  <p th:text="'Login: ' + ${user.login}"></p>
+  <p th:text="'Name: ' + ${user.name}"></p>
+  <p th:text="'Surname: ' + ${user.Surname}"></p>
+  <p th:text="'Date of birth: ' + ${#dates.format(user.dateOfBirth, 'dd-MM-yyyy')}"></p>
+  <p th:text="'Email: ' + ${user.email}"></p>
+  <p th:text="'Balance: ' + ${user.balance}"></p>
+  <p th:if="${!user.status}" th:text="'Status: ' + BLOCK"></p>
+  <p th:if="${user.status}" th:text="'Status: ' + UNBLOCK"></p>
+</div>
+<br>
+<div th:if="${!user.status}">
+  <form th:action="@{/admin/user/{id}/change_status(id=${user.personId})}" method="post">
+    <input type="submit" value="Unblock">
+  </form>
+</div>
+<div th:if="${user.status}">
+  <form th:action="@{/admin/user/{id}/change_status(id=${user.personId})}" method="post">
+    <input type="submit" value="Block">
+  </form>
+</div>
+<br>
+<form th:action="@{/admin/user/{id}/add_money(id=${user.personId})}" method="post">
+  <input type="number" step="0.01" name="sum">
+  <input type="submit" value="Add">
+</form>
+<br>
+<form action="/auth/home" method="get">
+  <input type="submit" value="home"/>
+</form>
+<br>
+<p>CURRENT ORDERS</p>
+<div th:each="order : ${orders}">
+  <div th:if="${order.status == 'OPEN'}">
+    <p th:text="'Bike: ' + ${order.bike.serialNumber} + ', term: ' + ${#dates.format(order.endDate, 'dd-MM-yyyy HH:mm')}"></p>
+    <form th:action="@{/admin/order/{id}/close(id=${order.orderId})}" method="post">
+      <input type="submit" value="Close"/>
+    </form>
+  </div>
+</div>
+</body>
+</html>
