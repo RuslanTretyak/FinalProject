@@ -22,13 +22,15 @@ public class OrderService {
     private ParkingPointRepository parkingPointRepository;
     private BikeRepository bikeRepository;
     private ParkingPointBikeMapService parkingPointBikeMapService;
+    private AppService appService;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository, ParkingPointRepository parkingPointRepository, BikeRepository bikeRepository, ParkingPointBikeMapService parkingPointBikeMapService) {
+    public OrderService(OrderRepository orderRepository, ParkingPointRepository parkingPointRepository, BikeRepository bikeRepository, ParkingPointBikeMapService parkingPointBikeMapService, AppService appService) {
         this.orderRepository = orderRepository;
         this.parkingPointRepository = parkingPointRepository;
         this.bikeRepository = bikeRepository;
         this.parkingPointBikeMapService = parkingPointBikeMapService;
+        this.appService = appService;
     }
 
     @Transactional
@@ -54,4 +56,17 @@ public class OrderService {
         return orderRepository.findBikeOrderByPerson(person.getPersonId());
     }
 
+    @Transactional
+    public void closeOrder(int id) {
+        Date date = new Date();
+        Order order = orderRepository.findById(id).get();
+        order.setStatus(OrderStatus.CLOSE.name());
+        order.getBike().setStatus(BikeStatus.AVAILABLE_FOR_PLACEMENT.name());
+        order.setEndDate(date);
+        Person person = order.getPerson();
+        person.setBalance(person.getBalance() - appService.calculateCost(order.getDateOfBegin(), date));
+    }
+    public Order getOrderById(int id){
+        return orderRepository.findById(id).get();
+    }
 }

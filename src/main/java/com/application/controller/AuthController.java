@@ -30,7 +30,7 @@ public class AuthController {
     }
     @GetMapping("/home")
     public ModelAndView showHomePage(@AuthenticationPrincipal UserDetails userDetails){
-        Person person = personService.getPersonByLogin(userDetails.getUsername());
+        Person person = personService.findPersonByLogin(userDetails.getUsername());
         ModelAndView modelAndView = new ModelAndView("home", "person", person);
         modelAndView.addObject("orders", orderService.getOrdersByPersonAndStatus(person, OrderStatus.OPEN));
         return modelAndView;
