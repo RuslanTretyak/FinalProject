@@ -4,11 +4,16 @@ import com.application.constant.BikeStatus;
 import com.application.constant.OrderStatus;
 import com.application.exception.DataNotFoundException;
 import com.application.model.entity.Bike;
+import com.application.model.entity.Order;
 import com.application.model.entity.ParkingPoint;
 import com.application.model.entity.Person;
 import com.application.service.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -128,8 +133,12 @@ public class AdminController {
             return modelAndView;
         } else {
             if (!login.isEmpty()) {
-                Person user = personService.findPersonByLogin(login);
-                users = Collections.singletonList(user);
+                try {
+                    Person user = personService.findPersonByLogin(login);
+                    users = Collections.singletonList(user);
+                } catch (DataNotFoundException e) {
+                    return modelAndView;
+                }
             } else if (!surname.isEmpty()) {
                 if (!name.isEmpty()) {
                     users = personService.findPersonBySurnameAndName(surname, name);
@@ -162,10 +171,48 @@ public class AdminController {
         personService.changePersonBalance(id, sum);
         return new ModelAndView("redirect:/admin/user/" + id);
     }
-
+    @GetMapping("/order/{id}")
+    public ModelAndView showOrderInfo(@PathVariable("id") int id) throws DataNotFoundException {
+        return new ModelAndView("order", "order", orderService.getOrderById(id));
+    }
     @PostMapping("/order/{id}/close")
-    public ModelAndView closeOrder(@PathVariable("id") int id) throws DataNotFoundException {
+    public ModelAndView closeOrder(@PathVariable("id") int id, @Param("page") String page) throws DataNotFoundException {
         orderService.closeOrder(id);
+        if (page != null){
+            if (page.equals("toOrder")){
+                return new ModelAndView("redirect:/admin/order/" + id);
+            }
+        }
         return new ModelAndView("redirect:/admin/user/" + orderService.getOrderById(id).getPerson().getPersonId());
+    }
+    @GetMapping("/user/{userId}/order_history/{page}")
+    public ModelAndView getUserOrderHistory(@PathVariable("userId") int userId, @PathVariable("page") int currentPage) throws DataNotFoundException {
+        Person person = personService.findPersonById(userId);
+        Pageable pageable = PageRequest.of(currentPage - 1, 5, Sort.by("dateOfBegin").descending());
+        Page<Order> page= orderService.getOrdersByPerson(person, pageable);
+        ModelAndView modelAndView = new ModelAndView("user_order_history_for_admin", "orders", page.getContent());
+        modelAndView.addObject("numberPages", page.getTotalPages());
+        return modelAndView;
+    }
+    @GetMapping("/order_history/{page}")
+    public ModelAndView getAllOrderHistory(@PathVariable("page") int currentPage, @RequestParam(name = "sorting", defaultValue = "1") int sorting) throws DataNotFoundException {
+        Sort sort;
+        switch (sorting) {
+            case (2) :
+                sort = Sort.by("endDate").descending();
+                break;
+            case (3) :
+                sort = Sort.by("status").descending().and(Sort.by("endDate").descending());
+                break;
+            default:
+                sort = Sort.by("dateOfBegin").descending();
+                break;
+        }
+        Pageable pageable = PageRequest.of(currentPage - 1, 5, sort);
+        Page<Order> page= orderService.getAllOrders(pageable);
+        ModelAndView modelAndView = new ModelAndView("all_order_history_for_admin", "orders", page.getContent());
+        modelAndView.addObject("numberPages", page.getTotalPages()).addObject("sorting", sorting);
+        System.out.println(sort);
+        return modelAndView;
     }
 }

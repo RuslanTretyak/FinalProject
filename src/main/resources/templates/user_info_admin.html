@@ -36,10 +36,14 @@
   <input type="submit" value="home"/>
 </form>
 <br>
+<form th:action="@{/admin/user/{userId}/order_history/1(userId=${user.personId})}" method="get">
+  <input type="submit" value="Order history">
+</form>
+<br>
 <p>CURRENT ORDERS</p>
 <div th:each="order : ${orders}">
   <div th:if="${order.status == 'OPEN'}">
-    <p th:text="'Bike: ' + ${order.bike.serialNumber} + ', term: ' + ${#dates.format(order.endDate, 'dd-MM-yyyy HH:mm')}"></p>
+    <p th:text="'Date: ' + ${#dates.format(order.dateOfBegin, 'dd-MM-yyyy HH:mm')} + ' Bike: ' + ${order.bike.serialNumber} + ', term: ' + ${#dates.format(order.endDate, 'dd-MM-yyyy HH:mm')}"></p>
     <form th:action="@{/admin/order/{id}/close(id=${order.orderId})}" method="post">
       <input type="submit" value="Close"/>
     </form>

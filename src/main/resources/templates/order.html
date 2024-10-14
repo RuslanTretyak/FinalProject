@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Order</title>
+</head>
+<body>
+<div>
+  <p th:text="'Date of begin: ' + ${#dates.format(order.dateOfBegin, 'dd-MM-yyyy HH:mm')}"></p>
+  <p th:text="'Term: ' + ${order.term}"></p>
+  <p th:text="'End Date: ' + ${#dates.format(order.endDate, 'dd-MM-yyyy HH:mm')}"></p>
+  <p th:text="'Status: ' + ${order.status}"></p>
+  <p th:text="'Bike: ' + ${order.bike.serialNumber}"></p>
+  <p th:text="'Parking: ' + ${order.parkingPoint.name}"></p>
+</div>
+<div th:if="${order.status.equals('OPEN')}">
+  <form th:action="@{/admin/order/{id}/close(id=${order.orderId})}" method="post">
+    <input type="hidden" name="page" value="toOrder"/>
+    <input type="submit" value="Close"/>
+  </form>
+</div>
+<br>
+<form th:action="@{/admin/user/{userId}(userId=${order.person.personId})}" method="get">
+  <input type="submit" value="Show User page"/>
+</form>
+</body>
+</html>

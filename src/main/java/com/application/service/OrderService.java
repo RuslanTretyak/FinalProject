@@ -12,6 +12,9 @@ import com.application.repository.OrderRepository;
 import com.application.repository.ParkingPointRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -53,8 +56,11 @@ public class OrderService {
     public List<Order> getOrdersByPersonAndStatus(Person person, OrderStatus orderStatus){
         return orderRepository.findBikeOrderByPersonAndStatus(person, orderStatus.name());
     }
-    public List<Order> getOrdersByPerson(Person person){
-        return orderRepository.findBikeOrderByPerson(person.getPersonId());
+    public Page<Order> getOrdersByPerson(Person person, Pageable pageable){
+        return orderRepository.findBikeOrderByPerson(person, pageable);
+    }
+    public Page<Order> getAllOrders(Pageable pageable){
+        return orderRepository.findAll(pageable);
     }
 
     @Transactional
@@ -66,6 +72,11 @@ public class OrderService {
         order.setEndDate(date);
         Person person = order.getPerson();
         person.setBalance(person.getBalance() - appService.calculateCost(order.getDateOfBegin(), date));
+    }
+    public boolean checkBalanceForOrder(OrderDTO orderDTO) {
+        Date date = new Date();
+        double cost = appService.calculateCost(date, new Date(date.getTime() + (orderDTO.getTerm() * 3600000L)));
+        return orderDTO.getPerson().getBalance() >= cost;
     }
     public Order getOrderById(int id) throws DataNotFoundException {
         return orderRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Order with id " + id + " was not found"));

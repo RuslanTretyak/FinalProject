@@ -8,7 +8,7 @@
 <form action="/logout" method="get">
     <input type="submit" value="logout"/>
 </form>
-<div th:if="${person.personRole.personRoleName == 'ROLE_ADMIN'}">
+<div th:if="${person.personRole.personRoleName.equals('ROLE_ADMIN')}">
     <p>ADMIN</p>
     <form action="/admin/bike" method="get">
         <input type="submit" value="bike"/>
@@ -19,25 +19,30 @@
     <form action="/admin/users" method="get">
         <input type="submit" value="Users"/>
     </form>
+    <form action="/admin/order_history/1" method="get">
+        <input type="submit" value="Orders"/>
+    </form>
 </div>
-
-<p>USER</p>
-<form action="/user/my_info" method="get">
-    <input type="submit" value="My info"/>
-</form>
-<br>
-<p>CURRENT ORDERS</p>
-<div th:each="order : ${orders}">
-    <div th:if="${order.status == 'OPEN'}">
-        <p th:text="'Bike: ' + ${order.bike.serialNumber} + ', term: ' + ${order.endDate}"></p>
+<div th:if="${person.personRole.personRoleName.equals('ROLE_USER')}">
+    <p>USER</p>
+    <form action="/user/my_info" method="get">
+        <input type="submit" value="My info"/>
+    </form>
+    <br>
+    <p>CURRENT ORDERS</p>
+    <div th:each="order : ${orders}">
+        <div th:if="${order.status.equals('OPEN')}">
+            <p th:text="'Bike: ' + ${order.bike.serialNumber} + ', term: ' + ${#dates.format(order.endDate, 'dd-MM-yyyy HH:mm:ss')}"></p>
+        </div>
     </div>
+    <form action="/user/order_history/1" method="get">
+        <input type="submit" value="Order history"/>
+    </form>
+    <form action="/user/make_order" method="post">
+        <input th:if="${!person.status}" type="submit" value="Order bike" disabled/>
+        <input th:if="${person.status}" type="submit" value="Order bike"/>
+    </form>
 </div>
-<form action="/user/order_history" method="get">
-    <input type="submit" value="Order history"/>
-</form>
-<form action="/user/make_order" method="post">
-    <input type="submit" value="Order bike"/>
-</form>
 
 
 </body>
