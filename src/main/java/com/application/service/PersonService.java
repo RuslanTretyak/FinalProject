@@ -1,5 +1,6 @@
 package com.application.service;
 
+import com.application.exception.DataNotFoundException;
 import com.application.model.dto.PersonDTO;
 import com.application.model.entity.Person;
 import com.application.repository.PersonRepository;
@@ -27,27 +28,33 @@ public class PersonService {
         this.personDTOMapper = personDTOMapper;
         this.passwordEncoder = passwordEncoder;
     }
+
     @Transactional
-    public void registerPerson(PersonDTO personDTO){
+    public void registerPerson(PersonDTO personDTO) {
         personDTO.setPassword(passwordEncoder.encode(personDTO.getPassword()));
         Person person = personDTOMapper.mapToPersonEntity(personDTO);
         person.setStatus(true);
         person.setPersonRole(personRoleRepository.findByPersonRoleName("ROLE_USER"));
         personRepository.save(person);
     }
-    public Person findPersonById(int id){
-        return personRepository.findById(id).get();
+
+    public Person findPersonById(int id) throws DataNotFoundException {
+        return personRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Person with id " + id + " was not found"));
     }
-    public Person findPersonByLogin(String login){
-        return personRepository.findByLogin(login).get();
+
+    public Person findPersonByLogin(String login) throws DataNotFoundException {
+        return personRepository.findByLogin(login).orElseThrow(() -> new DataNotFoundException("Person with login " + login + " was not found"));
     }
-    public List<Person> findPersonBySurname(String surname){
+
+    public List<Person> findPersonBySurname(String surname) {
         return personRepository.findBySurname(surname);
     }
-    public List<Person> findPersonByName(String name){
+
+    public List<Person> findPersonByName(String name) {
         return personRepository.findByName(name);
     }
-    public List<Person> findPersonBySurnameAndName(String surname, String name){
+
+    public List<Person> findPersonBySurnameAndName(String surname, String name) {
         return personRepository.findByNameAndSurname(name, surname);
     }
 
@@ -62,14 +69,14 @@ public class PersonService {
     }
 
     @Transactional
-    public void changePersonStatus(int id) {
-        Person person = personRepository.findById(id).get();
+    public void changePersonStatus(int id) throws DataNotFoundException {
+        Person person = personRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Person with id " + id + " was not found"));
         person.setStatus(!person.isStatus());
     }
 
     @Transactional
-    public void changePersonBalance(int id, double sum) {
-        Person person = personRepository.findById(id).get();
+    public void changePersonBalance(int id, double sum) throws DataNotFoundException {
+        Person person = personRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Person with id " + id + " was not found"));
         person.setBalance(person.getBalance() + sum);
     }
 }

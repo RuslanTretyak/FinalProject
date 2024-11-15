@@ -27,17 +27,17 @@ public class PersonValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         PersonDTO personDTO = (PersonDTO) target;
-        if(personRepository.findByLogin(personDTO.getLogin()).isPresent()){
+        if (personRepository.findByLogin(personDTO.getLogin()).isPresent()) {
             errors.rejectValue("login", "", "This login is already exist");
         }
-        if(personRepository.findByEmail(personDTO.getEmail()).isPresent()){
+        if (personRepository.findByEmail(personDTO.getEmail()).isPresent()) {
             errors.rejectValue("email", "", "This email is already exist");
         }
-        if(!personDTO.getPassword().equals(personDTO.getVerificationPassword())){
+        if (!personDTO.getPassword().equals(personDTO.getVerificationPassword())) {
             errors.rejectValue("verificationPassword", "", "verification password does not match");
         }
-        if(personDTO.getDateOfBirth() != null){
-            if(personDTO.getDateOfBirth().after(new Date())){
+        if (personDTO.getDateOfBirth() != null) {
+            if (personDTO.getDateOfBirth().after(new Date())) {
                 errors.rejectValue("dateOfBirth", "", "Date Of Birth is not correct");
             }
         }

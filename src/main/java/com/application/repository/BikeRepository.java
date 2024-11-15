@@ -16,5 +16,6 @@ public interface BikeRepository extends JpaRepository<Bike, Integer> {
     @Modifying
     @Query(value = "update bike set status = :status where bike_id = :id", nativeQuery = true)
     void updateBike(@Param("status") String status, @Param("id") int id);
+
     List<Bike> getBikeByStatus(String bikeStatus);
 }

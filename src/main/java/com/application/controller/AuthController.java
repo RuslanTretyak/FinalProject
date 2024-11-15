@@ -1,6 +1,7 @@
 package com.application.controller;
 
 import com.application.constant.OrderStatus;
+import com.application.exception.DataNotFoundException;
 import com.application.model.entity.Person;
 import com.application.service.OrderService;
 import com.application.service.PersonService;
@@ -29,7 +30,7 @@ public class AuthController {
         return "login";
     }
     @GetMapping("/home")
-    public ModelAndView showHomePage(@AuthenticationPrincipal UserDetails userDetails){
+    public ModelAndView showHomePage(@AuthenticationPrincipal UserDetails userDetails) throws DataNotFoundException {
         Person person = personService.findPersonByLogin(userDetails.getUsername());
         ModelAndView modelAndView = new ModelAndView("home", "person", person);
         modelAndView.addObject("orders", orderService.getOrdersByPersonAndStatus(person, OrderStatus.OPEN));

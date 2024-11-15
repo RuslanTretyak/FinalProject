@@ -16,6 +16,7 @@ public class MapperUtil {
         person.setPassword(personDTO.getPassword());
         return person;
     }
+
     public PersonDTO mapToPersonDTOEntity(Person person) {
         PersonDTO personDTO = new PersonDTO();
         personDTO.setLogin(person.getLogin());

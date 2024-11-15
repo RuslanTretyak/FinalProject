@@ -1,5 +1,6 @@
 package com.application.service;
 
+import com.application.exception.DataNotFoundException;
 import com.application.model.entity.Bike;
 import com.application.model.entity.ParkingPoint;
 import com.application.model.entity.Person;
@@ -26,7 +27,7 @@ public class ParkingService {
         parkingPointRepository.save(parkingPoint);
     }
 
-    public ParkingPoint getParkingById(int id) {
-        return parkingPointRepository.findById(id).get();
+    public ParkingPoint getParkingById(int id) throws DataNotFoundException {
+        return parkingPointRepository.findById(id).orElseThrow(() -> new DataNotFoundException("Parking Point with id " + id + " was not found"));
     }
 }

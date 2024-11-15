@@ -5,7 +5,8 @@ import com.application.model.entity.Person;
 public class OrderDTO {
     private int parkingPointId;
     private int bikeId;
-    private int term;
+    private int termMinutes;
+    private int termHours;
     private Person person;
 
     public Person getPerson() {
@@ -32,20 +33,19 @@ public class OrderDTO {
         this.bikeId = bikeId;
     }
 
-    public int getTerm() {
-        return term;
+    public int getTermMinutes() {
+        return termMinutes;
     }
 
-    public void setTerm(int term) {
-        this.term = term;
+    public void setTermMinutes(int termMinutes) {
+        this.termMinutes = termMinutes;
     }
 
-    @Override
-    public String toString() {
-        return "OrderDTO{" +
-                "parkingPointId=" + parkingPointId +
-                ", bikeId=" + bikeId +
-                ", term=" + term +
-                '}';
+    public int getTermHours() {
+        return termHours;
+    }
+
+    public void setTermHours(int termHours) {
+        this.termHours = termHours;
     }
 }

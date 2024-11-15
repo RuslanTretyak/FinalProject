@@ -29,8 +29,9 @@ public class RegisterController {
     public ModelAndView showRegisterPage(@ModelAttribute PersonDTO personDTO) {
         return new ModelAndView("register_person");
     }
+
     @PostMapping("/register")
-    public ModelAndView registerPerson(@Valid @ModelAttribute PersonDTO personDTO, BindingResult result){
+    public ModelAndView registerPerson(@Valid @ModelAttribute PersonDTO personDTO, BindingResult result) {
         personValidator.validate(personDTO, result);
         if (result.hasErrors()) {
             return new ModelAndView("register_person", "person", personDTO);
