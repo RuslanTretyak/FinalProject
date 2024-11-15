@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -49,7 +50,7 @@ public class UserController {
     @GetMapping("/my_info")
     public ModelAndView getMyInfo(@AuthenticationPrincipal UserDetails userDetails) throws DataNotFoundException {
         Person person = personService.findPersonByLogin(userDetails.getUsername());
-        return new ModelAndView("person_info", "person", person);
+        return new ModelAndView("user_info", "person", person);
 
     }
 
@@ -73,32 +74,38 @@ public class UserController {
     }
 
     @PostMapping("/make_order")
-    public ModelAndView createOrder(@AuthenticationPrincipal UserDetails userDetails, @ModelAttribute("order") OrderDTO orderDTO) throws DataNotFoundException {
+    public ModelAndView createOrder(@AuthenticationPrincipal UserDetails userDetails, @ModelAttribute("order") OrderDTO orderDTO, @Param("stage") String stage) throws DataNotFoundException {
         Person person = personService.findPersonByLogin(userDetails.getUsername());
+        ModelAndView modelAndView = new ModelAndView("make_order");
         if (!person.isStatus()) {
             return new ModelAndView("redirect:/auth/home");
         }
-        if (orderDTO.getParkingPointId() == 0) {
-            return new ModelAndView("choose_parking_to_order", "parking", parkingService.getAllParking());
-        } else if (orderDTO.getBikeId() == 0) {
-            return new ModelAndView("choose_bike_to_order", "bikes", bikeService.getBikeFromParking(orderDTO.getParkingPointId()));
-        } else if (orderDTO.getTerm() == 0) {
-            return new ModelAndView("choose_term_to_order");
-        } else {
+        if (stage == null) {
+            stage = "parking";
+        }
+        if (stage.equals("parking")) {
+            return modelAndView.addObject("parking", parkingService.getAllParking()).addObject("stage", stage);
+        } else if (stage.equals("bike")) {
+            return modelAndView.addObject("bikes", bikeService.getBikeFromParking(orderDTO.getParkingPointId())).addObject("stage", stage);
+        } else if (stage.equals("term")) {
+            return modelAndView.addObject("stage", stage);
+        } else if (stage.equals("makeOrder")) {
             orderDTO.setPerson(person);
             if (!orderService.checkBalanceForOrder(orderDTO)) {
-                return new ModelAndView("choose_term_to_order").addObject("message", "balance is insufficient");
+                stage = "term";
+                return modelAndView.addObject("message", "balance is insufficient").addObject("stage", stage);
             }
             orderService.createOrder(orderDTO);
             return new ModelAndView("redirect:/auth/home");
         }
+        return new ModelAndView("redirect:/user/make_order");
     }
 
     @GetMapping("/order_history/{page}")
     public ModelAndView getOrderHistory(@PathVariable("page") int currentPage, @AuthenticationPrincipal UserDetails userDetails) throws DataNotFoundException {
         Person person = personService.findPersonByLogin(userDetails.getUsername());
-        Pageable pageable = PageRequest.of(currentPage - 1, 5, Sort.by("dateOfBegin").ascending());
-        Page<Order> page= orderService.getOrdersByPerson(person, pageable);
+        Pageable pageable = PageRequest.of(currentPage - 1, 5, Sort.by("dateOfBegin").descending());
+        Page<Order> page = orderService.getOrdersByPerson(person, pageable);
         ModelAndView modelAndView = new ModelAndView("order_history", "orders", page.getContent());
         modelAndView.addObject("numberPages", page.getTotalPages());
         return modelAndView;

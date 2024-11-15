@@ -18,7 +18,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -33,19 +36,26 @@ public class AdminController {
     private ParkingPointBikeMapService parkingPointBikeMapService;
     private PersonService personService;
     private OrderService orderService;
+    private TariffService tariffService;
 
     @Autowired
-    public AdminController(BikeService bikeService, ParkingService parkingService, ParkingPointBikeMapService parkingPointBikeMapService, PersonService personService, OrderService orderService) {
+    public AdminController(BikeService bikeService, ParkingService parkingService, ParkingPointBikeMapService parkingPointBikeMapService, PersonService personService, OrderService orderService, TariffService tariffService) {
         this.bikeService = bikeService;
         this.parkingService = parkingService;
         this.parkingPointBikeMapService = parkingPointBikeMapService;
         this.personService = personService;
         this.orderService = orderService;
+        this.tariffService = tariffService;
     }
 
-    @GetMapping("/bike")
-    public ModelAndView showAllBikes() {
-        return new ModelAndView("bikes", "bikes", bikeService.getAllBikes());
+    @GetMapping("/bikes/{page}")
+    public ModelAndView showAllBikes(@PathVariable("page") int currentPage) {
+        Pageable pageable = PageRequest.of(currentPage - 1, 5, Sort.by("status"));
+        Page<Bike> page = bikeService.getAllBikes(pageable);
+        ModelAndView modelAndView = new ModelAndView("bikes", "bikes", page.getContent());
+        modelAndView.addObject("numberPages", page.getTotalPages());
+        return modelAndView;
+
     }
 
     @GetMapping("/bike/add")
@@ -59,7 +69,7 @@ public class AdminController {
             return new ModelAndView("add_bike", "statuses", BikeStatus.values());
         } else {
             bikeService.addNewBike(bike);
-            return new ModelAndView("redirect:/admin/bike");
+            return new ModelAndView("redirect:/admin/bikes/1");
         }
     }
 
@@ -156,7 +166,9 @@ public class AdminController {
     public ModelAndView showUserInfoPage(@PathVariable("id") int id) throws DataNotFoundException {
         Person user = personService.findPersonById(id);
         ModelAndView modelAndView = new ModelAndView("user_info_admin", "user", user);
-        modelAndView.addObject("orders", orderService.getOrdersByPersonAndStatus(user, OrderStatus.OPEN));
+        modelAndView
+                .addObject("orders", orderService.getOrdersByPersonAndStatus(user, OrderStatus.OPEN))
+                .addObject("sum", 0);
         return modelAndView;
     }
 
@@ -168,6 +180,15 @@ public class AdminController {
 
     @PostMapping("/user/{id}/add_money")
     public ModelAndView addMoneyToBalance(@PathVariable("id") int id, @Param("sum") double sum) throws DataNotFoundException {
+        if (sum <= 0) {
+            Person user = personService.findPersonById(id);
+            ModelAndView modelAndView = new ModelAndView("user_info_admin", "user", user);
+            modelAndView
+                    .addObject("orders", orderService.getOrdersByPersonAndStatus(user, OrderStatus.OPEN))
+                    .addObject("sum", sum)
+                    .addObject("error", "incorrect input");
+            return modelAndView;
+        }
         personService.changePersonBalance(id, sum);
         return new ModelAndView("redirect:/admin/user/" + id);
     }
@@ -196,23 +217,33 @@ public class AdminController {
     }
     @GetMapping("/order_history/{page}")
     public ModelAndView getAllOrderHistory(@PathVariable("page") int currentPage, @RequestParam(name = "sorting", defaultValue = "1") int sorting) throws DataNotFoundException {
-        Sort sort;
-        switch (sorting) {
-            case (2) :
-                sort = Sort.by("endDate").descending();
-                break;
-            case (3) :
-                sort = Sort.by("status").descending().and(Sort.by("endDate").descending());
-                break;
-            default:
-                sort = Sort.by("dateOfBegin").descending();
-                break;
-        }
+        Sort sort = switch (sorting) {
+            case (2) -> Sort.by("endDate").descending();
+            case (3) -> Sort.by("status").descending().and(Sort.by("endDate").descending());
+            default -> Sort.by("dateOfBegin").descending();
+        };
         Pageable pageable = PageRequest.of(currentPage - 1, 5, sort);
         Page<Order> page= orderService.getAllOrders(pageable);
         ModelAndView modelAndView = new ModelAndView("all_order_history_for_admin", "orders", page.getContent());
         modelAndView.addObject("numberPages", page.getTotalPages()).addObject("sorting", sorting);
         System.out.println(sort);
         return modelAndView;
+    }
+    @GetMapping("/tariff")
+    public ModelAndView showChangeTariffPage() throws DataNotFoundException {
+        return new ModelAndView("change_tariff", "currentTariff", tariffService.getCurrentTariff().getValue())
+                .addObject("newTariff", 0);
+    }
+    @PostMapping("/tariff")
+    public ModelAndView changeTariff(@Param("newTariff") double newTariff) throws DataNotFoundException {
+        if (newTariff <= 0) {
+            ModelAndView modelAndView = new ModelAndView("change_tariff", "currentTariff", tariffService.getCurrentTariff().getValue());
+            modelAndView
+                    .addObject("newTariff", newTariff)
+                    .addObject("error", "incorrect input");
+            return modelAndView;
+        }
+        tariffService.changeTariff(newTariff);
+        return new ModelAndView("redirect:/admin/tariff");
     }
 }

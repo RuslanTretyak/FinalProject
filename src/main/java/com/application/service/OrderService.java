@@ -46,9 +46,9 @@ public class OrderService {
         bike.setStatus(BikeStatus.IN_ORDER.name());
         order.setParkingPoint(parkingPointRepository.findById(orderDTO.getParkingPointId()).orElseThrow(() -> new DataNotFoundException("Parking Point with id " + orderDTO.getParkingPointId() + " was not found")));
         order.setBike(bike);
-        order.setTerm(orderDTO.getTerm());
+        order.setTerm((orderDTO.getTermHours() * 60) + orderDTO.getTermMinutes());
         order.setDateOfBegin(dateOfBegin);
-        order.setEndDate(new Date(dateOfBegin.getTime() + (orderDTO.getTerm() * 3600000L)));
+        order.setEndDate(new Date(dateOfBegin.getTime() + orderDTO.getTermHours() * 3600000L + orderDTO.getTermMinutes() * 60000L));
         order.setPerson(orderDTO.getPerson());
         order.setStatus(OrderStatus.OPEN.name());
         orderRepository.save(order);
@@ -73,9 +73,9 @@ public class OrderService {
         Person person = order.getPerson();
         person.setBalance(person.getBalance() - appService.calculateCost(order.getDateOfBegin(), date));
     }
-    public boolean checkBalanceForOrder(OrderDTO orderDTO) {
+    public boolean checkBalanceForOrder(OrderDTO orderDTO) throws DataNotFoundException {
         Date date = new Date();
-        double cost = appService.calculateCost(date, new Date(date.getTime() + (orderDTO.getTerm() * 3600000L)));
+        double cost = appService.calculateCost(date, new Date(date.getTime() + (orderDTO.getTermHours() * 3600000L) + (orderDTO.getTermMinutes() * 60000L)));
         return orderDTO.getPerson().getBalance() >= cost;
     }
     public Order getOrderById(int id) throws DataNotFoundException {

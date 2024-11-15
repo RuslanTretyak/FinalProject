@@ -8,6 +8,8 @@ import com.application.model.entity.ParkingPointBikeMap;
 import com.application.repository.BikeRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,8 +31,8 @@ public class BikeService {
         bikeRepository.save(bike);
     }
 
-    public List<Bike> getAllBikes() {
-        return bikeRepository.findAll();
+    public Page<Bike> getAllBikes(Pageable pageable) {
+        return bikeRepository.findAll(pageable);
     }
 
     public Bike getBikeById(int id) throws DataNotFoundException {

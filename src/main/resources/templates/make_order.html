@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Make order</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+</head>
+<body>
+<div>
+  <ul class="nav nav-tabs justify-content-center">
+    <li class="nav-item">
+      <a th:text="#{home}" class="nav-link" href="/auth/home">Home</a>
+    </li>
+    <li class="nav-item">
+      <a th:text="#{myinfo}" class="nav-link" href="/user/my_info">My info</a>
+    </li>
+    <li class="nav-item">
+      <a th:text="#{orders}" class="nav-link active" aria-current="page" href="/user/order_history/1">Orders</a>
+    </li>
+    <li class="nav-item">
+      <a th:text="#{logout}" class="btn btn-warning" href="/logout">Logout</a>
+    </li>
+  </ul>
+</div>
+<div class="p-3 d-flex justify-content-center">
+  <div th:if="${stage.equals('parking')}">
+    <form th:action="@{'/user/make_order'}" method="post" th:object="${order}">
+      <div class="p-3 d-flex justify-content-center">
+        <select class="form-select" th:field="*{parkingPointId}">
+          <option th:each="parkingPoint : ${parking}" th:text="${parkingPoint.name} + ', address: ' + ${parkingPoint.address}" th:value="${parkingPoint.parkingPointId}">One</option>
+        </select>
+        <input type="hidden" name="stage" value="bike"/>
+        <input class="btn btn-warning" type="submit" th:value="#{choose}"/>
+      </div>
+    </form>
+  </div>
+  <div th:if="${stage.equals('bike')}">
+    <form action="/user/make_order" method="post" th:object="${order}">
+      <div class="p-3 d-flex justify-content-center">
+        <select class="form-select" th:field="*{bikeId}">
+          <option th:each="bike : ${bikes}" th:text="${bike.serialNumber}" th:value="${bike.bikeId}">One</option>
+        </select>
+        <input type="hidden" th:field="*{parkingPointId}" th:value="*{parkingPointId}" id="parkingPointId"/>
+        <input type="hidden" name="stage" value="term"/>
+        <input class="btn btn-warning" type="submit" th:value="#{choose}"/>
+      </div>
+    </form>
+  </div>
+  <div th:if="${stage.equals('term')}">
+    <form name="term" action="/user/make_order" method="post" th:object="${order}">
+      <input type="hidden" th:field="*{bikeId}" th:value="*{bikeId}" id="bikeId"/>
+      <input type="hidden" th:field="*{parkingPointId}" th:value="*{parkingPointId}" id="parkingPointId"/>
+      <input type="hidden" name="stage" value="makeOrder"/>
+      <div class="container">
+        <div class="row">
+          <div class="col">
+            <div class="d-flex justify-content-center">
+              <h4 th:text="#{orderterm}">Order term</h4>
+            </div>
+            <div>
+              <h6 th:text="#{hours} + ':'">Hours:</h6>
+              <div class="input-group">
+              <span class="input-group-btn">
+                <button type="button" class="quantity-left-minus btn btn-warning btn-number"  data-type="minus" data-field="">
+                  <i class="bi bi-dash"></i>
+                </button>
+              </span>
+                <input type="number" id="termHours" name="termHours" class="form-control input-number" value="0" min="0" max="100" th:field="*{termHours}">
+                <span class="input-group-btn">
+                <button type="button" class="quantity-right-plus btn btn-warning btn-number" data-type="plus" data-field="">
+                  <i class="bi bi-plus"></i>
+                </button>
+              </span>
+              </div>
+              <br>
+            </div>
+            <div>
+              <h6 th:text="#{minutes} + ':'">Minutes:</h6>
+              <div class="input-group">
+              <span class="input-group-btn">
+                <button type="button" class="quantity-left-minus-1 btn btn-warning btn-number"  data-type="minus" data-field="">
+                  <i class="bi bi-dash"></i>
+                </button>
+              </span>
+                <input type="number" id="termMinutes" name="termMinutes" class="form-control input-number" value="0" min="0" max="100" th:field="*{termMinutes}">
+                <span class="input-group-btn">
+                <button type="button" class="quantity-right-plus-1 btn btn-warning btn-number" data-type="plus" data-field="">
+                  <i class="bi bi-plus"></i>
+                </button>
+              </span>
+              </div>
+              <br>
+            </div>
+            <div class="d-flex justify-content-center">
+              <input class="btn btn-warning" type="submit" th:value="#{choose}">
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+    <h2 th:text="${message}"/>
+  </div>
+</div>
+<script>
+  $(document).ready(function(){
+
+var quantitiy=0;
+   $('.quantity-right-plus').click(function(e){
+
+        // Stop acting like a button
+        e.preventDefault();
+        // Get the field name
+        var quantity = parseInt($('#termHours').val());
+
+        // If is not undefined
+
+            $('#termHours').val(quantity + 1);
+
+
+            // Increment
+
+    });
+
+     $('.quantity-left-minus').click(function(e){
+        // Stop acting like a button
+        e.preventDefault();
+        // Get the field name
+        var quantity = parseInt($('#termHours').val());
+
+        // If is not undefined
+
+            // Increment
+            if(quantity>0){
+            $('#termHours').val(quantity - 1);
+            }
+    });
+
+});
+$(document).ready(function(){
+
+var quantitiy=0;
+   $('.quantity-right-plus-1').click(function(e){
+
+        // Stop acting like a button
+        e.preventDefault();
+        // Get the field name
+        var quantity = parseInt($('#termMinutes').val());
+
+        // If is not undefined
+        if(quantity<45){
+            $('#termMinutes').val(quantity + 15);
+            }
+
+
+
+
+            // Increment
+
+    });
+
+     $('.quantity-left-minus-1').click(function(e){
+        // Stop acting like a button
+        e.preventDefault();
+        // Get the field name
+        var quantity = parseInt($('#termMinutes').val());
+
+        // If is not undefined
+
+            // Increment
+            if(quantity>0){
+            $('#termMinutes').val(quantity - 15);
+            }
+    });
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+</body>
+</html>

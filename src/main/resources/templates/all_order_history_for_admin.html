@@ -2,71 +2,132 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Orders</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 </head>
 <body>
-<form action="/logout" method="get">
-    <input type="submit" value="logout"/>
-</form>
-
-<form action="/admin/order_history/1" method="get">
-    <div class="form-check">
-        <input th:if="${sorting == 1}" class="form-check-input" type="radio" name="sorting" id="sorting1" value="1" checked>
-        <input th:if="${sorting != 1}" class="form-check-input" type="radio" name="sorting" id="sorting1" value="1" >
-        <label class="form-check-label" for="sorting1">
-            sorting1
-        </label>
-    </div>
-    <div class="form-check">
-        <input th:if="${sorting == 2}" class="form-check-input" type="radio" name="sorting" id="sorting2" value="2" checked>
-        <input th:if="${sorting != 2}" class="form-check-input" type="radio" name="sorting" id="sorting2" value="2" >
-        <label class="form-check-label" for="sorting2">
-            sorting2
-        </label>
-    </div>
-    <div class="form-check">
-        <input th:if="${sorting == 3}" class="form-check-input" type="radio" name="sorting" id="sorting3" value="3" checked>
-        <input th:if="${sorting != 3}" class="form-check-input" type="radio" name="sorting" id="sorting3" value="3" >
-        <label class="form-check-label" for="sorting2">
-            sorting3
-        </label>
-    </div>
-    <input type="submit" value="sort">
-</form>
-
-<p>ORDERS</p>
-<div th:each="order : ${orders}">
-    <a th:href="@{/admin/order/{orderId}(orderId=${order.orderId})}" th:text="'Date: ' + ${#dates.format(order.dateOfBegin, 'dd-MM-yyyy HH:mm:ss')} + ', ' + 'Bike: ' + ${order.bike.serialNumber} + ', term: ' + ${#dates.format(order.endDate, 'dd-MM-yyyy HH:mm:ss')} + ', status: ' + ${order.status}"></a>
-</div>
-<nav aria-label="...">
-    <ul class="pagination">
-        <li th:if="${page == 1}" class="page-item disabled">
-            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+<div>
+    <ul class="nav nav-tabs justify-content-center">
+        <li class="nav-item">
+            <a th:text="#{home}" class="nav-link" href="/auth/home">Home</a>
         </li>
-        <li th:if="${page > 1}" class="page-item">
-            <a class="page-link" th:href="@{/admin/order_history/{pageNumber}?sorting={sorting}(pageNumber=${page - 1}, sorting=${sorting})}">Previous</a>
+        <li class="nav-item">
+            <a th:text="#{bikes}" class="nav-link" href="/admin/bikes/1">Bikes</a>
         </li>
-
-        <li th:if="${page == numberPages && page - 2 >= 1}" class="page-item"><a class="page-link" th:href="@{/admin/order_history/{pageNumber}?sorting={sorting}(pageNumber=${page - 2}, sorting=${sorting})}" th:text="${page - 2}"></a></li>
-        <li th:if="${page > 1}" class="page-item"><a class="page-link" th:href="@{/admin/order_history/{pageNumber}?sorting={sorting}(pageNumber=${page - 1}, sorting=${sorting})}" th:text="${page - 1}"></a></li>
-        <li class="page-item active" aria-current="page">
-            <a class="page-link" th:href="@{/admin/order_history/{pageNumber}?sorting={sorting}(pageNumber=${page}, sorting=${sorting})}" th:text="${page}"></a>
+        <li class="nav-item">
+            <a th:text="#{parking}" class="nav-link" href="/admin/parking">Parking</a>
         </li>
-        <li th:if="${page < numberPages}" class="page-item"><a class="page-link" th:href="@{/admin/order_history/{pageNumber}?sorting={sorting}(pageNumber=${page + 1}, sorting=${sorting})}" th:text="${page + 1}"></a></li>
-        <li th:if="${page == 1 && page + 2 <= numberPages}" class="page-item"><a class="page-link" th:href="@{/admin/order_history/{pageNumber}?sorting={sorting}(pageNumber=${page + 2}, sorting=${sorting})}" th:text="${page + 2}"></a></li>
-
-        <li th:if="${page < numberPages}" class="page-item">
-            <a class="page-link" th:href="@{/admin/order_history/{pageNumber}?sorting={sorting}(pageNumber=${page + 1}, sorting=${sorting})}">Next</a>
+        <li class="nav-item">
+            <a th:text="#{users}" class="nav-link" href="/admin/users">Users</a>
         </li>
-        <li th:if="${page == numberPages}" class="page-item disabled">
-            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
+        <li class="nav-item">
+            <a th:text="#{orders}" class="nav-link active" aria-current="page" href="/admin/order_history/1">Orders</a>
+        </li>
+        <li class="nav-item">
+            <a th:text="#{logout}" class="btn btn-warning" href="/logout">Logout</a>
         </li>
     </ul>
-</nav>
-<form action="/auth/home" method="get">
-    <input type="submit" value="Home"/>
-</form>
+    <br>
+</div>
+<div class="container">
+    <div class="row align-items-center">
+        <div class="col-2">
+
+        </div>
+        <div class="col-8">
+            <div class="d-flex justify-content-center">
+                <p>ORDERS</p>
+            </div>
+            <div class="d-flex justify-content-center">
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col">Order Date</th>
+                        <th scope="col">Order Term</th>
+                        <th scope="col">Bike</th>
+                        <th scope="col">Order Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="order : ${orders}" th:href="@{/admin/order/{orderId}(orderId=${order.orderId})}">
+                        <td th:text="${#dates.format(order.dateOfBegin, 'dd-MM-yyyy HH:mm:ss')}"></td>
+                        <td th:text="${#dates.format(order.endDate, 'dd-MM-yyyy HH:mm:ss')}"></td>
+                        <td th:text="${order.bike.serialNumber}"></td>
+                        <td th:text="${order.status}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <br>
+            <div class="d-flex justify-content-center">
+                <nav aria-label="...">
+
+                    <ul class="pagination">
+                        <li th:if="${page == 1}" class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                        </li>
+                        <li th:if="${page > 1}" class="page-item">
+                            <a class="page-link" th:href="@{/admin/order_history/{pageNumber}?sorting={sorting}(pageNumber=${page - 1}, sorting=${sorting})}">Previous</a>
+                        </li>
+
+                        <li th:if="${page == numberPages && page - 2 >= 1}" class="page-item"><a class="page-link" th:href="@{/admin/order_history/{pageNumber}?sorting={sorting}(pageNumber=${page - 2}, sorting=${sorting})}" th:text="${page - 2}"></a></li>
+                        <li th:if="${page > 1}" class="page-item"><a class="page-link" th:href="@{/admin/order_history/{pageNumber}?sorting={sorting}(pageNumber=${page - 1}, sorting=${sorting})}" th:text="${page - 1}"></a></li>
+                        <li class="page-item active" aria-current="page">
+                            <a class="page-link" th:href="@{/admin/order_history/{pageNumber}?sorting={sorting}(pageNumber=${page}, sorting=${sorting})}" th:text="${page}"></a>
+                        </li>
+                        <li th:if="${page < numberPages}" class="page-item"><a class="page-link" th:href="@{/admin/order_history/{pageNumber}?sorting={sorting}(pageNumber=${page + 1}, sorting=${sorting})}" th:text="${page + 1}"></a></li>
+                        <li th:if="${page == 1 && page + 2 <= numberPages}" class="page-item"><a class="page-link" th:href="@{/admin/order_history/{pageNumber}?sorting={sorting}(pageNumber=${page + 2}, sorting=${sorting})}" th:text="${page + 2}"></a></li>
+
+                        <li th:if="${page < numberPages}" class="page-item">
+                            <a class="page-link" th:href="@{/admin/order_history/{pageNumber}?sorting={sorting}(pageNumber=${page + 1}, sorting=${sorting})}">Next</a>
+                        </li>
+                        <li th:if="${page == numberPages}" class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <div class="col-2">
+            <div class="d-flex justify-content-center">
+                <form action="/admin/order_history/1" method="get">
+                    <div class="form-check">
+                        <input th:if="${sorting == 1}" class="form-check-input" type="radio" name="sorting" id="sorting1" value="1" checked>
+                        <input th:if="${sorting != 1}" class="form-check-input" type="radio" name="sorting" id="sorting1" value="1" >
+                        <label class="form-check-label" for="sorting1">
+                            By date of begin
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input th:if="${sorting == 2}" class="form-check-input" type="radio" name="sorting" id="sorting2" value="2" checked>
+                        <input th:if="${sorting != 2}" class="form-check-input" type="radio" name="sorting" id="sorting2" value="2" >
+                        <label class="form-check-label" for="sorting2">
+                            By end date
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input th:if="${sorting == 3}" class="form-check-input" type="radio" name="sorting" id="sorting3" value="3" checked>
+                        <input th:if="${sorting != 3}" class="form-check-input" type="radio" name="sorting" id="sorting3" value="3" >
+                        <label class="form-check-label" for="sorting2">
+                            Open orders first
+                        </label>
+                    </div>
+                    <input class="btn btn-warning" type="submit" value="sort">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+$(document).ready(function(){
+    $('table tr').click(function(){
+        window.location = $(this).attr('href');
+        return false;
+    });
+});
+</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
 </body>
 </html>

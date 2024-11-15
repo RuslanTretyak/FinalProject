@@ -2,23 +2,62 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Login Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="#{loginpage}">Login Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 </head>
 <body>
-<form name="f" method="post" action="/process_login">
-  <label for="username">Enter Login</label>
-  <input type="text" name="username" id="username">
-  <br>
-  <label for="password">Enter Password</label>
-  <input type="password" name="password" id="password">
-  <br>
-  <input type="submit" value="Login">
-
-  <div th:if="${param.error}" style="color: red">Login or Password is incorrect</div>
-</form>
-<form action="/register" method="get">
-    <input type="submit" value="Registration"/>
-</form>
-
+<div class="p-5 d-flex justify-content-center">
+    <div>
+        <form name="f" method="post" action="/process_login">
+            <div th:if="${param.error}" style="color: red">
+                <label th:text="#{username}" for="username">Enter Login</label>
+                <input class="form-control is-invalid" type="text" name="username" id="username">
+                <br>
+                <label th:text="#{password}" for="password">Enter Password</label>
+                <input class="form-control is-invalid" type="password" name="password" id="password">
+                <br>
+                <p th:text="#{lopii}">Login or Password is incorrect</p>
+            </div>
+            <div th:unless="${param.error}">
+                <label th:text="#{username}" for="username">Enter Login</label>
+                <input class="form-control" type="text" name="username" id="username">
+                <br>
+                <label th:text="#{password}" for="password">Enter Password</label>
+                <input class="form-control" type="password" name="password" id="password">
+                <br>
+            </div>
+            <div class="d-flex justify-content-center">
+                <input class="btn btn-warning" type="submit" th:value="#{login}">
+            </div>
+        </form>
+        <br>
+        <div class="d-flex justify-content-center">
+            <a th:text="#{registration}" class="btn btn-warning" href="/register">Registration</a>
+        </div>
+    </div>
+</div>
+<div class="d-flex justify-content-center">
+    <div>
+        <span th:text="#{lang.change}"></span>
+        <select class="form-select" id="locales">
+            <option value=""></option>
+            <option value="en" th:text="#{lang.eng}"></option>
+            <option value="ru" th:text="#{lang.ru}"></option>
+        </select>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+    $("#locales").change(function () {
+        var selectedOption = $('#locales').val();
+        if (selectedOption != ''){
+            window.location.replace('login?lang=' + selectedOption);
+        }
+    });
+});
+</script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
 </body>
 </html>
